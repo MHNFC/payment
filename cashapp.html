@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting to Cash App...</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    button {
+      background-color: #00d632;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00b72a;
+    }
+  </style>
+</head>
+<body>
+  <h2>Preparing to open Cash App...</h2>
+  <p>If nothing happens automatically, you may need to tap a button below.</p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const cashtag = params.get('client');
+    const encodedCashtag = encodeURIComponent(`$${cashtag}`);
+    const cashAppLink = `cashapp://send?recipient=%24${encodeURIComponent(cashtag)}`;
+    const cashWebLink = `https://cash.app/$${encodeURIComponent(cashtag)}`;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    if (cashtag) {
+      if (isAndroid) {
+        // Try app, fallback to web
+        window.location.href = cashAppLink;
+        setTimeout(() => {
+          window.location.href = cashWebLink;
+        }, 2000);
+      } else if (isIOS) {
+        // iOS requires user interaction
+        document.body.innerHTML = `
+          <h2>Open in Cash App</h2>
+          <p>Tap the button below to pay <strong>$${cashtag}</strong> using Cash App.</p>
+          <button onclick="openCashApp()">Pay $${cashtag} in Cash App</button>
+        `;
+      } else {
+        // Unknown device: fallback to web
+        window.location.href = cashWebLink;
+      }
+    } else {
+      document.body.innerHTML = "Missing client info.";
+    }
+
+    function openCashApp() {
+      window.location.href = cashAppLink;
+      setTimeout(() => {
+        window.location.href = cashWebLink;
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
